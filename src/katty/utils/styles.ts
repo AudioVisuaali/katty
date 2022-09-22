@@ -1,26 +1,32 @@
-export const applyAnimalStyles = (id: string, image: string) => `
-.${id}::before {
-  content: " ";
-  position: absolute;
-  height: 64px;
-  width: 64px;
-  top: -64px;
-  left: 20px;
-  background-image: url("${image}");
-  background-size: 128px 64px;
-  image-rendering: -webkit-optimize-contrast;
-  animation-name: sprite;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: step-end;
-}
+import { ActionAnimation, Size } from "../Animal";
 
-@keyframes sprite {
-  0% {
-    background-position: 0px 0px;
+const toPx = (size: number) => `${size}px`
+
+export const applyAnimalStyles = (id: string, size: Size, animation: ActionAnimation) => {
+  const percentages = [...new Array(animation.frames)].map((_, i) => Math.floor((i / animation.frames) * 100))
+
+  return `
+  .${id}::before {
+    content: " ";
+    position: absolute;
+    height: ${toPx(size.height)};
+    width: ${toPx(size.width)};
+    top: ${toPx(-size.width)};
+    left: 20px;
+    background-image: url("${animation.sprite}");
+    background-size: ${toPx(size.width * animation.frames)} ${toPx(size.height)};
+    animation-name: sprite;
+    animation-duration: ${animation.duration}s;
+    animation-iteration-count: infinite;
+    animation-timing-function: step-end;
   }
-  50%  {
-    background-position: 64px 0px;
+  
+  @keyframes sprite {
+    ${percentages.map((percentage, index) => `
+    ${percentage}% {
+      background-position: ${index * size.width}px 0px;
+    }
+    `).join("")}
   }
+  `
 }
-`

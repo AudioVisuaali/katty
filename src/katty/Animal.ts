@@ -4,6 +4,11 @@ import { applyAnimalStyles } from "./utils/styles";
 
 type ActionType = "movement" | "idle"
 
+export type Size = {
+  width: number;
+  height: number;
+}
+
 type DurationRandom = { min: number, max: number }
 type DurationFixed = number
 type Duration = DurationRandom | DurationFixed
@@ -12,12 +17,17 @@ type NextAllowedAction = {
   name: string;
 }
 
+export type ActionAnimation = {
+  frames: number;
+  duration: Duration;
+  sprite: string;
+}
+
 type ActionBase<T extends ActionType> = {
   name: string;
   type: T;
-  duration: Duration;
-  sprite: string;
-  nextActions: NextAllowedAction[]
+  nextActions: NextAllowedAction[];
+  animation: ActionAnimation;
 }
 
 type ActionMove = ActionBase<"movement"> & {
@@ -30,27 +40,48 @@ type Action = ActionMove | ActionIdle
 
 type Params = {
   actions: Action[];
+  size: Size;
   element: HTMLElement;
 }
 
 export class Animal {
+  // Properties
   public id : string;
+  private size: Size;
+
+  // Actions
   public actions: Action[]
-  private element: HTMLElement;
-  private styleElement: HTMLStyleElement | null = null;
   private currentAction: Action | null = null;
   private timeoutId: number | null = null;
 
+  // Elements
+  private element: HTMLElement;
+  private styleElement: HTMLStyleElement | null = null;
+
   constructor(params: Params) {
     this.id = `katty-${new Date().getTime().toString()}`;
+    
     this.actions = params.actions;
     this.element = params.element;
+    this.size = params.size;
   }
 
-  private getRandomAction() {
-    const newAction = this.actions[Math.floor(Math.random() * this.actions.length)]
-    this.currentAction = newAction
+  private getNextBoringRoutineOptions(): Action[] {
+    if (!this.currentAction) {
+      return this.actions;  
+    }
 
+    const nextActions = this.currentAction.nextActions;
+
+    return this.actions.filter(action => nextActions.some(nextAction => nextAction.name === action.name))
+  }
+
+  private getNextBoringRoutine() {
+    const possibilities = this.getNextBoringRoutineOptions()
+
+    const newAction = possibilities[Math.floor(Math.random() * possibilities.length)]
+    
+    this.currentAction = newAction
     return this.currentAction
   }
   
@@ -67,26 +98,28 @@ export class Animal {
   }
 
   private switchBoringRoutine = () => {
-    const action = this.getRandomAction();
+    const action = this.getNextBoringRoutine();
     if (!action) {
       return this.murderBrutally()
     }
 
-    this.doBoringRoutine(action);
+    this.setLimbMovement(action.animation)
 
-    const duration = this.getDuration(action.duration) * 1000
+    const duration = this.getDuration(action.animation.duration) * 1000
     this.timeoutId = setTimeout(this.switchBoringRoutine, duration)
   }
 
-  private doBoringRoutine(action: Action) {
-    this.setSprite(action.sprite)
-  }
-
-  private setSprite(sprite: string): void {
+  private setLimbMovement(animation: ActionAnimation): void {
+    const prevStyleElement = this.styleElement
+    
     const document = ownerDocument(null);
     this.styleElement = document.head.appendChild(document.createElement("style"));
-    this.styleElement.innerHTML = applyAnimalStyles(this.id, sprite);
+    this.styleElement.innerHTML = applyAnimalStyles(this.id, this.size, animation);
     this.element.classList.add(this.id)
+
+    if (prevStyleElement) {
+      prevStyleElement.remove();
+    }
   }
 
   public murderBrutally(): void {
