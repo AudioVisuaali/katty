@@ -2,7 +2,9 @@
 import { ownerDocument } from "./utils/ownerDocument";
 import { applyAnimalStyles } from "./utils/styles";
 
-type ActionType = "movement" | "idle"
+export type ActionTypeMovement = "movement";
+export type ActionTypeIdle = "idle";
+export type ActionType = ActionTypeMovement | ActionTypeIdle;
 
 export type Size = {
   width: number;
@@ -11,10 +13,11 @@ export type Size = {
 
 type DurationRandom = { min: number, max: number }
 type DurationFixed = number
-type Duration = DurationRandom | DurationFixed
+export type Duration = DurationRandom | DurationFixed
 
 type NextAllowedAction = {
   name: string;
+  possibility: number;
 }
 
 export type ActionAnimation = {
@@ -30,13 +33,17 @@ type ActionBase<T extends ActionType> = {
   animation: ActionAnimation;
 }
 
-type ActionMove = ActionBase<"movement"> & {
+export type ActionMove = ActionBase<ActionTypeMovement> & {
   pxPerSecond: number;
 }
 
-type ActionIdle = ActionBase<"idle">
+export type ActionIdle = ActionBase<ActionTypeIdle>
 
 type Action = ActionMove | ActionIdle
+
+const mathRandomInterval = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
 
 type Params = {
   actions: Action[];
@@ -48,6 +55,7 @@ export class Animal {
   // Properties
   public id : string;
   private size: Size;
+  private positionOffset: number = 0;
 
   // Actions
   public actions: Action[]
@@ -61,28 +69,43 @@ export class Animal {
   constructor(params: Params) {
     this.id = `katty-${new Date().getTime().toString()}`;
     
+    this.positionOffset = 0;
     this.actions = params.actions;
     this.element = params.element;
     this.size = params.size;
   }
 
-  private getNextBoringRoutineOptions(): Action[] {
-    if (!this.currentAction) {
-      return this.actions;  
+  private getNExtBoringRoutineByNext(nextActions: NextAllowedAction[]): Action {
+    const totalPossibility = nextActions.reduce((prev,curr) => prev + curr.possibility, 0)
+    const value = mathRandomInterval(0, totalPossibility)
+
+    let currentTotal = 0;
+    for (const nextAction of nextActions) {
+      currentTotal += nextAction.possibility
+      if (currentTotal < value) {
+        continue
+      }
+
+      const action = this.actions.find(action => action.name === nextAction.name);
+
+      if (!action) {
+        throw new Error("Invalid next function name provided")
+      }
+
+      return action;
     }
 
-    const nextActions = this.currentAction.nextActions;
-
-    return this.actions.filter(action => nextActions.some(nextAction => nextAction.name === action.name))
+    throw new Error("Should not happen")
   }
 
-  private getNextBoringRoutine() {
-    const possibilities = this.getNextBoringRoutineOptions()
+  private getNextBoringRoutine(): Action {
+    if (!this.currentAction) {
+      const newAction = this.actions[Math.floor(Math.random() * this.actions.length)]
+      this.currentAction = newAction
+      return this.currentAction
+    }
 
-    const newAction = possibilities[Math.floor(Math.random() * possibilities.length)]
-    
-    this.currentAction = newAction
-    return this.currentAction
+    return this.getNExtBoringRoutineByNext(this.currentAction.nextActions)
   }
   
   private getDuration(duration: Duration): number {
@@ -103,23 +126,53 @@ export class Animal {
       return this.murderBrutally()
     }
 
-    this.setLimbMovement(action.animation)
+    this.currentAction = action;
+    const durationOverride = this.setLimbMovement(action)
 
-    const duration = this.getDuration(action.animation.duration) * 1000
+    const duration = durationOverride === null ? this.getDuration(action.animation.duration) * 1000 : durationOverride * 1000;
     this.timeoutId = setTimeout(this.switchBoringRoutine, duration)
   }
 
-  private setLimbMovement(animation: ActionAnimation): void {
-    const prevStyleElement = this.styleElement
+  private getOffsetPosition(action: Action) {
+    if (action.type !== "movement") {
+      return {
+        offsetX: this.positionOffset,
+        duration: 0,
+      }
+    }
     
+    const currentPosition = this.positionOffset;
+    const width = this.element.getBoundingClientRect().width
+    const newPosition = mathRandomInterval(0, width - this.size.width)
+    const positionDiff = Math.abs(newPosition - currentPosition) 
+    const positionDiffInSeconds = positionDiff / action.pxPerSecond;
+    this.positionOffset = newPosition;
+
+    return {
+      offsetX: newPosition,
+      duration: positionDiffInSeconds,
+    }
+  }
+
+  private setLimbMovement(action: Action): number | null {
+    const prevStyleElement = this.styleElement;
+
+    const offset = this.getOffsetPosition(action)
+
     const document = ownerDocument(null);
     this.styleElement = document.head.appendChild(document.createElement("style"));
-    this.styleElement.innerHTML = applyAnimalStyles(this.id, this.size, animation);
-    this.element.classList.add(this.id)
+    this.styleElement.innerHTML = applyAnimalStyles(this.id, this.size, action.animation, offset);
+    this.element.classList.add(this.id);
 
     if (prevStyleElement) {
       prevStyleElement.remove();
     }
+
+    if (action.type === "movement") {
+      return offset.duration;
+    }
+
+    return null
   }
 
   public murderBrutally(): void {
