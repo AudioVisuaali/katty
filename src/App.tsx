@@ -1,4 +1,4 @@
-import { RefCallback, useRef, useState } from 'react'
+import { RefCallback, useState } from 'react'
 import { useKatty } from './katty/useCatPlayground'
 import './App.css'
 

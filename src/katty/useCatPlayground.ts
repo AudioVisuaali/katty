@@ -26,7 +26,19 @@ export function useKatty(params: Params): void {
                         sprite: "./images/pixel-art-kitten.png",
                         frames: 2,
                     },
-                    nextActions: [{ name: "jam" }]
+                    nextActions: [{ name: "kek", possibility: 20 }]
+                },
+                {
+                    name: "kek",
+                    type: "movement",
+                    nextActions: [{ name: "jam", possibility: 20 }],
+                    animation: {
+                        frames: 2,
+                        duration: 2,
+                        sprite: "./images/pixel-art-kitten.png"
+                    },
+                    pxPerSecond: 40,
+
                 }
             ]
         })
