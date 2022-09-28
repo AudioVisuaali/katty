@@ -1,5 +1,6 @@
 import { RefCallback, useState } from 'react'
 import { useKatty } from './katty/useCatPlayground'
+import { EXAMPLE_ACTIONS } from "./katty/example"
 import './App.css'
 
 function App() {
@@ -13,7 +14,14 @@ function App() {
     setLevelRef(ref)
   }
 
-  useKatty({ element: levelRef })
+  useKatty({
+    element: levelRef,
+    size: {
+        height: 20,
+        width: 27,
+    },
+    actions: EXAMPLE_ACTIONS
+})
 
   return (
     <div className="app">

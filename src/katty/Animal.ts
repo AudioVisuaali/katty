@@ -11,41 +11,59 @@ export type Size = {
   height: number;
 }
 
-type DurationRandom = { min: number, max: number }
-type DurationFixed = number
-export type Duration = DurationRandom | DurationFixed
+export type Duration = number
 
 type NextAllowedAction = {
   name: string;
   possibility: number;
 }
 
-export type ActionAnimation = {
+type AnimationBase = {
   frames: number;
+  size: Size;
   duration: Duration;
+}
+
+type AnimationIdle = AnimationBase & {
   sprite: string;
 }
+
+type AnimationMove = AnimationBase & {
+  spriteRight: string;
+  spriteLeft: string;
+  pxPerSecond: number;
+}
+
+export type Animation = AnimationIdle | AnimationMove
 
 type ActionBase<T extends ActionType> = {
   name: string;
   type: T;
   nextActions: NextAllowedAction[];
-  animation: ActionAnimation;
 }
 
 export type ActionMove = ActionBase<ActionTypeMovement> & {
-  pxPerSecond: number;
+  animation: AnimationMove;
 }
 
-export type ActionIdle = ActionBase<ActionTypeIdle>
+export type ActionIdle = ActionBase<ActionTypeIdle> & {
+  duration: number;
+  animation: AnimationIdle;
+}
 
-type Action = ActionMove | ActionIdle
+export type Action = ActionMove | ActionIdle
+
+export type MovementMeta = {
+  offsetX: number;
+  duration: number;
+  direction: number
+}
 
 const mathRandomInterval = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-type Params = {
+export type AnimalOptions = {
   actions: Action[];
   size: Size;
   element: HTMLElement;
@@ -60,13 +78,13 @@ export class Animal {
   // Actions
   public actions: Action[]
   private currentAction: Action | null = null;
-  private timeoutId: number | null = null;
+  private timeoutId: NodeJS.Timeout | null = null;
 
   // Elements
   private element: HTMLElement;
   private styleElement: HTMLStyleElement | null = null;
 
-  constructor(params: Params) {
+  constructor(params: AnimalOptions) {
     this.id = `katty-${new Date().getTime().toString()}`;
     
     this.positionOffset = 0;
@@ -75,7 +93,7 @@ export class Animal {
     this.size = params.size;
   }
 
-  private getNExtBoringRoutineByNext(nextActions: NextAllowedAction[]): Action {
+  private getNextBoringRoutineByNext(nextActions: NextAllowedAction[]): Action {
     const totalPossibility = nextActions.reduce((prev,curr) => prev + curr.possibility, 0)
     const value = mathRandomInterval(0, totalPossibility)
 
@@ -105,15 +123,7 @@ export class Animal {
       return this.currentAction
     }
 
-    return this.getNExtBoringRoutineByNext(this.currentAction.nextActions)
-  }
-  
-  private getDuration(duration: Duration): number {
-    if (typeof duration === "number") {
-      return duration;
-    }
-
-    return Math.floor(Math.random() * (duration.max - duration.min + 1) + duration.min);
+    return this.getNextBoringRoutineByNext(this.currentAction.nextActions)
   }
 
   public startLiving() {
@@ -129,28 +139,31 @@ export class Animal {
     this.currentAction = action;
     const durationOverride = this.setLimbMovement(action)
 
-    const duration = durationOverride === null ? this.getDuration(action.animation.duration) * 1000 : durationOverride * 1000;
+    const duration = action.type === "idle" ? action.duration * 1000 : (durationOverride ?? action.animation.duration) * 1000;
     this.timeoutId = setTimeout(this.switchBoringRoutine, duration)
   }
 
-  private getOffsetPosition(action: Action) {
+  private getOffsetPosition(action: Action): MovementMeta {
     if (action.type !== "movement") {
       return {
         offsetX: this.positionOffset,
         duration: 0,
+        direction: 0
       }
     }
     
     const currentPosition = this.positionOffset;
     const width = this.element.getBoundingClientRect().width
     const newPosition = mathRandomInterval(0, width - this.size.width)
-    const positionDiff = Math.abs(newPosition - currentPosition) 
-    const positionDiffInSeconds = positionDiff / action.pxPerSecond;
+    const positionDiffNonAbs = newPosition - currentPosition
+    const positionDiff = Math.abs(positionDiffNonAbs) 
+    const positionDiffInSeconds = positionDiff / action.animation.pxPerSecond;
     this.positionOffset = newPosition;
 
     return {
       offsetX: newPosition,
       duration: positionDiffInSeconds,
+      direction: positionDiffNonAbs,
     }
   }
 
@@ -161,7 +174,19 @@ export class Animal {
 
     const document = ownerDocument(null);
     this.styleElement = document.head.appendChild(document.createElement("style"));
-    this.styleElement.innerHTML = applyAnimalStyles(this.id, this.size, action.animation, offset);
+    this.styleElement.innerHTML = applyAnimalStyles({
+      id: this.id,
+      size: this.size,
+      animation: {
+        sprite: action.type === "idle" ? action.animation.sprite : offset.direction < 0 ? action.animation.spriteLeft : action.animation.spriteRight,
+        duration: action.animation.duration,
+        frames: action.animation.frames,
+      },
+      movement: {
+        offsetX: offset.offsetX,
+        duration: offset.duration,
+      }
+    })
     this.element.classList.add(this.id);
 
     if (prevStyleElement) {
