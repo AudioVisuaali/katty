@@ -11,7 +11,10 @@ export type Size = {
   height: number;
 }
 
-export type Duration = number
+export type Duration = number | {
+  min: number;
+  max: number
+};
 
 type NextAllowedAction = {
   name: string;
@@ -21,7 +24,7 @@ type NextAllowedAction = {
 type AnimationBase = {
   frames: number;
   size: Size;
-  duration: Duration;
+  duration: number;
 }
 
 type AnimationIdle = AnimationBase & {
@@ -47,7 +50,7 @@ export type ActionMove = ActionBase<ActionTypeMovement> & {
 }
 
 export type ActionIdle = ActionBase<ActionTypeIdle> & {
-  duration: number;
+  duration: Duration;
   animation: AnimationIdle;
 }
 
@@ -87,10 +90,10 @@ export class Animal {
   constructor(params: AnimalOptions) {
     this.id = `katty-${new Date().getTime().toString()}`;
     
-    this.positionOffset = 0;
     this.actions = params.actions;
     this.element = params.element;
     this.size = params.size;
+    this.positionOffset = this.getRandomPosition();
   }
 
   private getNextBoringRoutineByNext(nextActions: NextAllowedAction[]): Action {
@@ -118,6 +121,12 @@ export class Animal {
 
   private getNextBoringRoutine(): Action {
     if (!this.currentAction) {
+      const stableAction = this.actions.find(action => action.type === "idle");
+
+      if (stableAction) {
+        return stableAction;
+      }
+
       const newAction = this.actions[Math.floor(Math.random() * this.actions.length)]
       this.currentAction = newAction
       return this.currentAction
@@ -130,6 +139,18 @@ export class Animal {
     this.switchBoringRoutine()
   }
 
+  private calculateDuration(action: Action, override: number | null): number {
+    if (action.type === "movement") {
+      return (override ?? action.animation.duration) * 1000
+    }
+
+    if (typeof action.duration === "number") {
+      return action.duration;
+    }
+
+    return mathRandomInterval(action.duration.min, action.duration.max);
+  }
+
   private switchBoringRoutine = () => {
     const action = this.getNextBoringRoutine();
     if (!action) {
@@ -139,8 +160,13 @@ export class Animal {
     this.currentAction = action;
     const durationOverride = this.setLimbMovement(action)
 
-    const duration = action.type === "idle" ? action.duration * 1000 : (durationOverride ?? action.animation.duration) * 1000;
+    const duration = this.calculateDuration(action, durationOverride)
     this.timeoutId = setTimeout(this.switchBoringRoutine, duration)
+  }
+
+  private getRandomPosition(): number {
+    const width = this.element.getBoundingClientRect().width
+    return mathRandomInterval(0, width - this.size.width)
   }
 
   private getOffsetPosition(action: Action): MovementMeta {
@@ -153,8 +179,7 @@ export class Animal {
     }
     
     const currentPosition = this.positionOffset;
-    const width = this.element.getBoundingClientRect().width
-    const newPosition = mathRandomInterval(0, width - this.size.width)
+    const newPosition = this.getRandomPosition()
     const positionDiffNonAbs = newPosition - currentPosition
     const positionDiff = Math.abs(positionDiffNonAbs) 
     const positionDiffInSeconds = positionDiff / action.animation.pxPerSecond;
