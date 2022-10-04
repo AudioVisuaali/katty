@@ -15,7 +15,7 @@ export default defineConfig({
       formats: ["es", "cjs"],
     },
     rollupOptions: {
-      external: [],
+      external: ["react"],
       plugins: [
         typescript({
           sourceMap: false,

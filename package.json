@@ -1,10 +1,8 @@
 {
   "name": "katty",
   "private": false,
-  "version": "1.0.10",
-  "files": [
-    "dist"
-  ],
+  "version": "1.1.0",
+  "files": ["dist", "README.md"],
   "main": "./dist/main.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
@@ -13,9 +11,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.2.0"
-  },
-  "peerDependencies": {
     "react": "^18.2.0"
   },
   "devDependencies": {
