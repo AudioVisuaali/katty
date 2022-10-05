@@ -1,31 +1,23 @@
-import { RefCallback, useState } from 'react'
+import { useRef } from 'react'
 import { useKatty } from './katty/useCatPlayground'
 import { EXAMPLE_ACTIONS } from "./katty/example"
 import './App.css'
 
 function App() {
-  const [levelRef, setLevelRef] = useState<HTMLDivElement | null>(null)
-
-  const handleRef: RefCallback<HTMLDivElement> = (ref) => {
-    if (!ref) {
-      return
-    }
-
-    setLevelRef(ref)
-  }
+  const levelRef = useRef<HTMLDivElement>(null);
 
   useKatty({
-    element: levelRef,
+    element: levelRef.current,
     size: {
         height: 20,
         width: 27,
     },
     actions: EXAMPLE_ACTIONS
-})
+  })
 
   return (
     <div className="app">
-      <div ref={handleRef} className="level level-1" />
+      <div ref={levelRef} className="level level-1" />
     </div>
   )
 }

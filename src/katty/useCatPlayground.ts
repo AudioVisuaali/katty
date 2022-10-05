@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "react"
+import { useEffect, useState } from "react"
 import { Action, Animal, AnimalOptions, Size } from "./Animal"
 
 type KattyOptions = {
@@ -8,7 +8,17 @@ type KattyOptions = {
 }
 
 export function useKatty(params: KattyOptions): void {
-    useLayoutEffect(() => {
+    const [hasMounted, setHasMounted] = useState(false)
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, [])
+
+    useEffect(() => {
+        if (!hasMounted) {
+            return
+        }
+
         if (!params.element) {
             return 
         }
@@ -18,5 +28,5 @@ export function useKatty(params: KattyOptions): void {
         animal.startLiving()
 
         return (): void => animal.murderBrutally()
-    }, [params.element])
+    }, [params.element, hasMounted])
 }
