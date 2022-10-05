@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { Action, Animal } from "./Animal";
+import { Action, Animal, Size } from "./Animal";
 import { EXAMPLE_ACTIONS } from "./example";
 
 export function useKattyDefault(
   element: HTMLElement | null,
-  size: number,
+  size: Size,
   actions: Action[] = EXAMPLE_ACTIONS,
 ): void {
   const [hasMounted, setHasMounted] = useState(false);
@@ -26,8 +26,8 @@ export function useKattyDefault(
     const animal = new Animal({
       actions,
       size: {
-        width: size,
-        height: size,
+        width: size.width,
+        height: size.height,
       },
       element,
     });
