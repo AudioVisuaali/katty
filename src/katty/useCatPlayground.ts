@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useLayoutEffect } from "react"
 import { Action, Animal, AnimalOptions, Size } from "./Animal"
 
 type KattyOptions = {
@@ -8,7 +8,7 @@ type KattyOptions = {
 }
 
 export function useKatty(params: KattyOptions): void {
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!params.element) {
             return 
         }
