@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 import typescript from "@rollup/plugin-typescript";
+import react from "@vitejs/plugin-react";
 import path from "path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
@@ -21,8 +21,7 @@ export default defineConfig({
           sourceMap: false,
           declaration: true,
           outDir: "dist",
-          baseUrl:"./",
-          include: ["./src/katty"],
+          rootDir: "./src/katty",
         }),
       ],
     },
