@@ -1,21 +1,20 @@
 #root {
-  width: 1400px;
-  height: 400px;
+  width: 1100px;
   border: 1px solid #000;
   margin: 20px auto 20px auto;
   background-color: #00000022;
-  position: relative;
+}
+
+.app {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .level {
   height: 10px;
-  min-width: 200px;
   background-color: #000;
-}
-
-.level-1 {
-  position: absolute;
-  width: 1000px;
-  top: 200px;
-  left: 200px;
+  width: 100%;
+  max-width: 1000px;
 }

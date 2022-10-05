@@ -2,7 +2,20 @@
 
 Add a cat to your website
 
-## React example (ts)
+## React example (ts) Quick
+```ts
+import { EXAMPLE_ACTIONS, EXAMPLE_SIZE, useKattyDefault } from "katty";
+
+export const Component = (): ReactElement => {
+  const platformRef = useRef<HTMLDivElement>(null);
+
+  useKattyDefault(platformRef.current, 30 /* size */);
+
+  return <div ref={platformRef}></div>;
+};
+```
+
+## React example (ts) more options
 ```ts
 import { EXAMPLE_ACTIONS, EXAMPLE_SIZE, useKatty } from "katty";
 

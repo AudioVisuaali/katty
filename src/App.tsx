@@ -1,25 +1,27 @@
-import { useRef } from 'react'
-import { useKatty } from './katty/useCatPlayground'
-import { EXAMPLE_ACTIONS } from "./katty/example"
-import './App.css'
+import { ReactElement, useRef } from "react";
 
-function App() {
+import { EXAMPLE_ACTIONS } from "./katty/example";
+import { useKatty } from "./katty/useKatty";
+import "./App.css";
+
+function App(): ReactElement {
   const levelRef = useRef<HTMLDivElement>(null);
 
   useKatty({
     element: levelRef.current,
     size: {
-        height: 20,
-        width: 27,
+      height: 20,
+      width: 27,
     },
-    actions: EXAMPLE_ACTIONS
-  })
+    actions: EXAMPLE_ACTIONS,
+  });
 
   return (
     <div className="app">
-      <div ref={levelRef} className="level level-1" />
+      <div ref={levelRef} className="level" />
     </div>
-  )
+  );
 }
 
-export default App
+// eslint-disable-next-line no-restricted-syntax
+export default App;

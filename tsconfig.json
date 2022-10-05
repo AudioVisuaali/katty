@@ -12,11 +12,12 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "noEmit": true,
-    "jsx": "preserve",
-    "baseUrl": "./",
+    "jsx": "react-jsx",
+    "baseUrl": "src",
+    "rootDir": ".",
   },
-  "include": ["./src/katty"],
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

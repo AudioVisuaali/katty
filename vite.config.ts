@@ -21,6 +21,8 @@ export default defineConfig({
           sourceMap: false,
           declaration: true,
           outDir: "dist",
+          baseUrl:"./",
+          include: ["./src/katty"],
         }),
       ],
     },
