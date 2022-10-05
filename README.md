@@ -2,6 +2,8 @@
 
 Add a cat to your website
 
+[NPM](https://www.npmjs.com/package/katty)
+
 ## React example (ts) Quick
 ```ts
 import { EXAMPLE_ACTIONS, EXAMPLE_SIZE, useKattyDefault } from "katty";
