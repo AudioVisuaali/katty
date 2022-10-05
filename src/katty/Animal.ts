@@ -124,6 +124,7 @@ export class Animal {
       const stableAction = this.actions.find(action => action.type === "idle");
 
       if (stableAction) {
+        this.currentAction = stableAction;
         return stableAction;
       }
 
@@ -145,10 +146,10 @@ export class Animal {
     }
 
     if (typeof action.duration === "number") {
-      return action.duration;
+      return action.duration  * 1000;
     }
 
-    return mathRandomInterval(action.duration.min, action.duration.max);
+    return mathRandomInterval(action.duration.min, action.duration.max) * 1000;
   }
 
   private switchBoringRoutine = () => {

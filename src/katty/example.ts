@@ -22,7 +22,7 @@ export const EXAMPLE_ACTIONS: Action[] = [
             sprite: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAABkCAYAAADDhn8LAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9bxQ9aLFhExCFDdbIgKuKoVShChVArtOpgcukXNGlIUlwcBdeCgx+LVQcXZ10dXAVB8APE0clJ0UVK/F9SaBHjwXE/3t173L0D/PUyU82OcUDVLCOViAuZ7KrQ9YoeDCCEMMISM/U5UUzCc3zdw8fXuxjP8j735wgpOZMBPoF4lumGRbxBPL1p6Zz3iSOsKCnE58RjBl2Q+JHrsstvnAsO+3lmxEin5okjxEKhjeU2ZkVDJZ4ijiqqRvn+jMsK5y3OarnKmvfkLwzmtJVlrtMcRgKLWIIIATKqKKEMCzFaNVJMpGg/7uEfcvwiuWRylcDIsYAKVEiOH/wPfndr5icn3KRgHOh8se2PEaBrF2jUbPv72LYbJ0DgGbjSWv5KHZj5JL3W0qJHQN82cHHd0uQ94HIHGHzSJUNypABNfz4PvJ/RN2WB/lugd83trbmP0wcgTV0lb4CDQ2C0QNnrHu/ubu/t3zPN/n4ALWlyi1/pISsAAAAGYktHRABUAFQAVDNjwfUAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfmCRYNLx6UYK5QAAACgUlEQVR42u3dwW3bMBgGULswegq6h3foFB1BO3gK7uARMkV28B5BL7lEHUAsQJsU+Ut67yg0MCPmK/WJtnU+jTNnjp2NhUh+OAUgICAgICDQUa8iuijB9/t98Y+maeoxxkhjicRNEysICAgICAgIDHaJNJjb7bY4llKa136NAyq9UdG6LP/MHPsaNBYrCAgICAgICByipM+vFuPr9bp6qc69RuUNg93urm/gpsmvzLFPKwi4xAIBAQGBrVqjYBbt0m7RRt8CX3TTpPTmxePxaDq4mtdNKa0+H1YQEBAQEBAQ6Kl2J/3lXfNc4S0t86N+di+766XFuPXPjhqzFQQEBAQEBAS2orZMFu2a//n4uzj2/vutaamuKd+tx3cK9IVrpbvmW7xp0mN33QoCAgICAgICuyvpexa9pLtpoqSDSywQEBAQ2GdJb/rZZsW9fSHPcdOk7m/fCgICAgICAgI9XZyC/fB4uaeeeW8FAZdYICAgILCvkn60XfPW32zemvmwgoBLLBAQEBA4cEk/mlwJfqIo5v4z+nZWY8+HFQRcYoGAgIBAT//7XO7Lj1bzmfS8ys+pm49B82EFAZdYICAgINCTt7tXivQWePPRfj6sICAgICAgIBCypCuA5eelR3E3H33mwwoCAgICAgICIUt6adHJlaSaZ2ZHUvp79CjQ5qPPfFhBQEBAQEBAIGRJLy2APUpXdKPeAm8+2s+HFQQEBAQEBAQilPTFF2illOaSwhb9MWWty2ju900pFZ3TJ5iPQfNhBQEBAQEBAYEIJb2o1EzTNI8obJGsUMjNR6D5sIKAgICAgIBAT+dOrzMHH+O8gXNoPgaMzwoCAgICAgICPf0DxQn2ii9Q0MUAAAAASUVORK5CYII=",
             frames: 2,
         },
-        nextActions: [{ name: "walk", possibility: 20 }, { name: "kek", possibility: 5 }]
+        nextActions: [{ name: "walk", possibility: 20 }, { name: "wiggle", possibility: 5 }]
     },
     {
         name: "wiggle",
@@ -42,7 +42,7 @@ export const EXAMPLE_ACTIONS: Action[] = [
     {
         name: "walk",
         type: "movement",
-        nextActions: [{ name: "jam", possibility: 20 }],
+        nextActions: [{ name: "jam", possibility: 20 }, { name: "wiggle", possibility: 5 }],
         animation: {
             size: {
                 height: 100,
