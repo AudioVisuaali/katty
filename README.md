@@ -11,7 +11,7 @@ import { EXAMPLE_ACTIONS, EXAMPLE_SIZE, useKattyDefault } from "katty";
 export const Component = (): ReactElement => {
   const platformRef = useRef<HTMLDivElement>(null);
 
-  useKattyDefault(platformRef.current, 30 /* size */);
+  useKattyDefault(platformRef.current, 1.5 /* scale */);
 
   return <div ref={platformRef}></div>;
 };

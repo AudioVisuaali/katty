@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { Action, Animal, Size } from "./Animal";
-import { EXAMPLE_ACTIONS } from "./example";
+import { Action, Animal } from "./Animal";
+import { EXAMPLE_ACTIONS, EXAMPLE_SIZE } from "./example";
 
 export function useKattyDefault(
   element: HTMLElement | null,
-  size: Size,
+  scale: number,
   actions: Action[] = EXAMPLE_ACTIONS,
 ): void {
   const [hasMounted, setHasMounted] = useState(false);
@@ -26,8 +26,8 @@ export function useKattyDefault(
     const animal = new Animal({
       actions,
       size: {
-        width: size.width,
-        height: size.height,
+        width: EXAMPLE_SIZE.width * scale,
+        height: EXAMPLE_SIZE.height * scale,
       },
       element,
     });
@@ -35,5 +35,5 @@ export function useKattyDefault(
     animal.startLiving();
 
     return (): void => animal.murderBrutally();
-  }, [element, hasMounted, size, actions]);
+  }, [element, hasMounted, actions, scale]);
 }
